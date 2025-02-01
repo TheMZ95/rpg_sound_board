@@ -5,6 +5,7 @@ use crossterm::event::{Event, KeyCode, KeyEventKind, KeyModifiers};
 use crossterm::terminal::{disable_raw_mode, enable_raw_mode};
 use crossterm::{cursor, event, execute};
 use lazy_static::lazy_static;
+use soloud::Soloud;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 #[derive(Parser, Debug)]
@@ -43,6 +44,8 @@ fn main() {
     let mut stdout = std::io::stdout();
     execute!(stdout, cursor::MoveToNextLine(1)).expect("Failed to move cursor");
 
+    let mut sl = Soloud::default().unwrap();
+
     while is_running() {
         // Simulate some work
         if event::poll(std::time::Duration::from_secs(1)).expect("Error polling events") {
@@ -58,6 +61,9 @@ fn main() {
                     (KeyCode::Char('c'), KeyModifiers::CONTROL) => {
                         RUNNING.store(false, Ordering::SeqCst);
                         println!("Exiting...");
+                    }
+                    (KeyCode::Char('f'), _) => {
+                        sounds::player::play_sound_once(&sl, "Feuer 01.mp3");
                     }
                     (KeyCode::Char(c), _) => {
                         println!("Key pressed: '{}'", c);
